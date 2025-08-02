@@ -8,26 +8,54 @@ import { Op } from "sequelize";
 
 
 const app = express();
+app.use(express.json()); // For parsing JSON request bodies
 const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretjdfjdhgfgfiguifuidfjdndifjid";
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+
+  if (!token) return res.status(401).json({ error: "Access denied. No token provided." });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: "Invalid token" });
+    req.user = user; // Attach user data to request
+    next();
+  });
+}
+
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body;
+
+ 
+  if (username === "admin" && password === "password") {
+    const user = { username }; // payload
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: "1h" });
+    res.json({ token });
+  } else {
+    res.status(401).json({ error: "Invalid credentials" });
+  }
+});
 
 
 await initDB();
-app.get("/api/discover", async (req, res) => {
+app.get("/api/discover", authenticateToken, async (req, res) => {
   const data = await discoverMovies();
   res.json(data);
 });
 
-app.get("/api/movie/:id", async (req, res) => {
+app.get("/api/movie/:id", authenticateToken, async (req, res) => {
   const data = await getMovieDetails(req.params.id);
   res.json(data);
 });
 
-app.get("/api/cast/:id", async (req, res) => {
+app.get("/api/cast/:id", authenticateToken, async (req, res) => {
   const data = await getMovieCast(req.params.id);
   res.json(data);
 });
 
-app.get("/api/movies", async (req, res) => {
+app.get("/api/movies", authenticateToken, async (req, res) => {
   try {
     const {
       page = 1, 
