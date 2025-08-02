@@ -16,10 +16,10 @@ const tmdbApi = axios.create({
 });
 
 // Discover Movies
-export async function discoverMovies() {
+export async function discoverMovies(page =1 ) {
    try {
-    console.log("Token being sent:", process.env.TMDB_BEARER_TOKEN);
-    const res = await tmdbApi.get("/discover/movie", {
+    console.log("Token being sent:");
+    const res = await tmdbApi.get(`/discover/movie?page=${page}`, {
       headers: {
         Authorization: `Bearer ${process.env.TMDB_BEARER_TOKEN}`,
       },
@@ -29,6 +29,8 @@ export async function discoverMovies() {
     console.error("TMDb API error (discover):", err.response?.data || err.message);
   }
 }
+
+
 
 // Movie Details
 export async function getMovieDetails(id) {
