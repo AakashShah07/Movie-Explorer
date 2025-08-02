@@ -2,9 +2,10 @@
   "name": "mo_ex_ap",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"nodemon src/index.js"
+    "dev": "nodemon src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +21,6 @@
   "devDependencies": {
     "nodemon": "^3.1.10"
   },
+  
   "description": ""
 }

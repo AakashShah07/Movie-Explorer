@@ -1,17 +1,25 @@
-require("dotenv").config();
-const express = require("express");
-const { sequelize } = require("./models");
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import { discoverMovies, getMovieCast, getMovieDetails } from "./services/tmdbservice.js";
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => res.send("Movie Explorer API is running"));
+app.get("/api/discover", async (req, res) => {
+  const data = await discoverMovies();
+  res.json(data);
+});
 
-sequelize
-  .sync()
-  .then(() => {
-    app.listen(process.env.PORT, () =>
-      console.log(`Server running on port ${process.env.PORT}`)
-    );
-  })
-  .catch((err) => console.error("DB connection error:", err));
+app.get("/api/movie/:id", async (req, res) => {
+  const data = await getMovieDetails(req.params.id);
+  res.json(data);
+});
+
+app.get("/api/cast/:id", async (req, res) => {
+  const data = await getMovieCast(req.params.id);
+  res.json(data);
+});
+
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
